@@ -1,0 +1,60 @@
+\ProvidesPackage{subcommand}
+
+\gdef\name@of@cs#1{\expandafter\@cdr\string#1\@nil}
+
+\gdef\subcmd@init#1#2{\bgroup%
+  \let\@ef=\expandafter%
+  \edef\@name{\name@of@cs{#2}}%
+  \edef\@name@o{subcmd@\name@of@cs{#2}@o}%
+  \edef\@name@s{subcmd@\name@of@cs{#2}@s}%
+  % backup original command
+  \@ef\@ef\@ef\global\@ef\@ef\@ef\let\@ef\csname\@ef\@name@o\@ef\endcsname\@ef%
+  =\csname\@name\endcsname%
+  % redefine #2
+  \def\subcmd@def@s##1##2##3##4{%
+    \expandafter\gdef\csname\@name\endcsname%
+    {\@ifnextchar##4{\csname ##1\endcsname}{\csname ##2\endcsname}}}%
+  \@ef\@ef\@ef\subcmd@def@s\@ef\@ef\@ef{\@ef\@name@s\@ef}\@ef{\@name@o}{#2}#1%
+  % subcommand handler
+  \@ef\gdef\csname\@name@s\endcsname##1{%
+    \csname \name@of@cs{#2}#1\endcsname}%
+  \egroup}
+
+\gdef\subcmd@prefix#1#2#3{\bgroup%
+  \edef\@name{\name@of@cs{#3}#2#1}%
+  \expandafter\gdef\csname\@name\endcsname##1{%
+    \expandafter\@ifundefined{\name@of@cs{#3}#2#1##1}%
+    {\PackageError{subcommand}{No such command `\string#3#2#1##1'.}\@ehc}%
+    {\csname \name@of@cs{#3}#2#1##1\endcsname}}%
+  \egroup}
+
+\gdef\subcmd@split#1#2#3{\bgroup%
+  \edef\cmd{}%
+  \@tfor\ch:=#1\do{%
+    \edef\cmd{\cmd\ch}%
+    \expandafter\subcmd@prefix\expandafter{\cmd}{#2}{#3}%
+  }\egroup}
+
+\gdef\@subcommand#1#2[#3]{%
+  \bgroup{%
+    \let\@ef=\expandafter%
+    \@ef\@ifundefined{subcmd@\name@of@cs{#1}@s}{%
+      % initialize
+      \@ef\subcmd@init\@ef{#2}{#1}%
+      % define \cmd:
+      \@ef\subcmd@prefix\@ef{\@ef}\@ef{#2}{#1}%
+    }{}%
+    \edef\@arg{#3}%
+    % define \cmd:a \cmd:ac \cmd:act \cmd:acti \cmd:actio \cmd:action
+    \@ef\@ef\@ef\subcmd@split\@ef\@ef\@ef{\@ef\@arg\@ef}\@ef{#2}{#1}%
+  }\egroup%
+  % override definition of \cmd:action by specified definition body
+  \expandafter\long\expandafter\gdef%
+  \csname \name@of@cs{#1}#2#3\endcsname}
+
+\gdef\subcommand#1#2{%
+  \@ifnextchar[{\@subcommand{#1}{#2}}{\@subcommand{#1}{#2}[]}}
+
+\endinput
+%%
+%% End of file `subcommand.sty'

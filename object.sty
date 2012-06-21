@@ -15,7 +15,7 @@
 
 %% methods
 \gdef\@ignsp#1{\ifx\:#1\@empty\else #1\expandafter\@ignsp\fi}
-\gdef\object@def@method#1#2(#3)#4{%
+\long\gdef\object@def@method#1#2(#3)#4{%
   \subcommand{#1}[.#2](##1){\bgroup%
     \let\@ef=\expandafter%
     \gdef\object@arguments{}%

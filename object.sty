@@ -1,0 +1,45 @@
+\ProvidesPackage{object}
+
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{subcommand}}
+\ProcessOptions\relax
+\RequirePackage{subcommand}
+
+%% fields
+\gdef\object@field@set#1#2#3{\subcommand{#2}[.#3]{#1}}
+\gdef\object@def@field@#1#2[#3]{%
+  \subcommand{#1}[.#2]{#3}% getter
+  \subcommand{#1}[.#2:=]##1{\subcommand{#1}[.#2]{##1}}% setter (call by name)
+  \subcommand{#1}[.#2=]##1{% setter (call by value)
+    \expandafter\object@field@set\expandafter{##1}{#1}{#2}}}
+\gdef\object@def@field#1#2{\object@def@field@{#1}{#2}[]}
+
+%% methods
+\gdef\@ignsp#1{\ifx\:#1\@empty\else #1\expandafter\@ignsp\fi}
+\gdef\object@def@method#1#2(#3)#4{%
+  \subcommand{#1}[.#2](##1){\bgroup%
+    \let\@ef=\expandafter%
+    \gdef\object@arguments{}%
+    \def\arguments{}%
+    \@for\@x:=##1\do{% push arguments
+      \@cons\object@arguments{{\@x}}%
+      \@cons\arguments{{\@x}}%
+    }%
+    \let\@arg\relax%
+    \@for\@param:=#3\do{%
+      \edef\@param{\expandafter\@ignsp\@param\:}%
+      \@next\@arg\object@arguments{%
+        \@ef\@ef\@ef\def\@ef\csname\@ef\@param\@ef\endcsname\@ef{\@arg}%
+      }{}%
+    }%
+    \let\this=#1%
+    #4%
+  \egroup}}
+
+\gdef\object{}
+\subcommand\object[::field]#1#2{%
+  \@ifnextchar[{\object@def@field@{#1}{#2}}{\object@def@field{#1}{#2}}}
+\subcommand\object[::method]{\object@def@method}
+
+\endinput
+%%
+%% End of file `object.sty'

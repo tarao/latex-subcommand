@@ -1,0 +1,54 @@
+\documentclass{jarticle}
+\usepackage{object}
+\begin{document}
+
+\def\describe#1{\texttt{(#1) \expandafter\meaning\csname #1\endcsname}}
+
+\def\constructor#1{
+  \def#1{}
+  \object::field#1{foo}
+  \object::method#1put(arg) {
+    [\this.foo] and [\arg]
+  }
+  \object::method#1plus(lhs, rhs) {
+    (\this.foo) $\lhs+\rhs$
+  }
+  \object::method#1args() {
+    \describe{arguments}
+  }
+}
+
+\constructor\obj
+\constructor\obk
+
+\obj.foo = {FOO}
+\obj.foo
+
+\obk.foo = {foo}
+\obk.foo
+
+\obj.foo
+
+\obj.put(BAR)
+
+\obk.put(bar)
+
+\obj.foo = {HOGE}
+
+\obj.put(PIYO)
+
+\def\tmp{hoge foo}
+
+\obj.foo = \tmp
+
+\obj.foo
+
+\obj.foo := \tmp
+
+\obj.plus(x,3)
+
+\obk.plus(y,z)
+
+\obj.args(hoge,foo,bar)
+
+\end{document}

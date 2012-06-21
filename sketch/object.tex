@@ -4,7 +4,7 @@
 
 \def\describe#1{\texttt{(#1) \expandafter\meaning\csname #1\endcsname}}
 
-\def\constructor#1{
+\def\myclass#1{
   \def#1{}
   \object::field#1{foo}
   \object::method#1put(arg) {
@@ -18,8 +18,8 @@
   }
 }
 
-\constructor\obj
-\constructor\obk
+\myclass\obj
+\myclass\obk
 
 \obj.foo = {FOO}
 \obj.foo

@@ -7,6 +7,6 @@
 	platex $*
 	dvips -f $< | ps2pdf - $@
 
-test: test.pdf
-test.dvi: test.tex
-test.pdf: test.dvi
+object: object.pdf
+object.dvi: object.tex
+object.pdf: object.dvi
